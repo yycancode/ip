@@ -2,14 +2,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class YY {
-    private static class Task {
-        String description;
-        boolean done;
-        Task(String description) { this.description = description; this.done = false; }
-        void mark() { this.done = true; }
-        void unmark() { this.done = false; }
-        String checkbox() { return done ? "[X]" : "[ ]"; }
-    }
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         ArrayList<Task> tasks = new ArrayList<>();
@@ -21,22 +13,28 @@ public class YY {
         System.out.println(line);
 
         while (true) {
-            String input = sc.nextLine();
+            String input = sc.nextLine().trim();
 
-            if (input.equals("bye")) {
+            if (input.equalsIgnoreCase("bye")) {
                 System.out.println(line);
                 System.out.println("Bye. Hope to see you again soon!");
                 System.out.println(line);
                 break;
-            } else if (input.equals("list")) {
+
+            } else if (input.equalsIgnoreCase("list")) {
                 System.out.println(line);
-                System.out.println("Here are the tasks in your list:");
-                for (int i = 0; i < tasks.size(); i++) {
-                    Task t = tasks.get(i);
-                    System.out.println((i + 1) + "." + t.checkbox() + " " + t.description);
+                if (tasks.isEmpty()) {
+                    System.out.println("Your list is empty.");
+                } else {
+                    System.out.println("Here are the tasks in your list:");
+                    for (int i = 0; i < tasks.size(); i++) {
+                        Task t = tasks.get(i);
+                        System.out.println((i + 1) + "." + t);
+                    }
                 }
                 System.out.println(line);
-            } else if (input.startsWith("mark ")) {
+
+            } else if (input.toLowerCase().startsWith("mark ")) {
                 try {
                     int idx = Integer.parseInt(input.substring(5).trim()) - 1;
                     if (idx >= 0 && idx < tasks.size()) {
@@ -44,7 +42,7 @@ public class YY {
                         t.mark();
                         System.out.println(line);
                         System.out.println("Nice! I've marked this task as done:");
-                        System.out.println("  " + t.checkbox() + " " + t.description);
+                        System.out.println("  " + t);
                         System.out.println(line);
                     } else {
                         System.out.println(line);
@@ -56,7 +54,8 @@ public class YY {
                     System.out.println("Please provide a task number, e.g., mark 2");
                     System.out.println(line);
                 }
-            } else if (input.startsWith("unmark ")) {
+
+            } else if (input.toLowerCase().startsWith("unmark ")) {
                 try {
                     int idx = Integer.parseInt(input.substring(7).trim()) - 1;
                     if (idx >= 0 && idx < tasks.size()) {
@@ -64,7 +63,7 @@ public class YY {
                         t.unmark();
                         System.out.println(line);
                         System.out.println("OK, I've marked this task as not done yet:");
-                        System.out.println("  " + t.checkbox() + " " + t.description);
+                        System.out.println("  " + t);
                         System.out.println(line);
                     } else {
                         System.out.println(line);
@@ -76,11 +75,68 @@ public class YY {
                     System.out.println("Please provide a task number, e.g., unmark 2");
                     System.out.println(line);
                 }
-            } else {
-                Task t = new Task(input);
+
+            } else if (input.toLowerCase().startsWith("todo ")) {
+                String desc = input.substring(5).trim();
+                if (desc.isEmpty()) {
+                    System.out.println(line);
+                    System.out.println("The description of a todo cannot be empty.");
+                    System.out.println(line);
+                    continue;
+                }
+                Task t = new Todo(desc);
                 tasks.add(t);
                 System.out.println(line);
-                System.out.println("added: " + input);
+                System.out.println("Got it. I've added this task:");
+                System.out.println("  " + t);
+                System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+                System.out.println(line);
+
+            } else if (input.toLowerCase().startsWith("deadline ")) {
+                String rest = input.substring(9).trim();
+                String[] parts = rest.split("/by", 2);
+                if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
+                    System.out.println(line);
+                    System.out.println("Format: deadline <description> /by <when>");
+                    System.out.println(line);
+                    continue;
+                }
+                Task t = new Deadline(parts[0].trim(), parts[1].trim());
+                tasks.add(t);
+                System.out.println(line);
+                System.out.println("Got it. I've added this task:");
+                System.out.println("  " + t);
+                System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+                System.out.println(line);
+
+            } else if (input.toLowerCase().startsWith("event ")) {
+                String rest = input.substring(6).trim();
+                String[] descAndFrom = rest.split("/from", 2);
+                if (descAndFrom.length < 2 || descAndFrom[0].trim().isEmpty()) {
+                    System.out.println(line);
+                    System.out.println("Format: event <description> /from <start> /to <end>");
+                    System.out.println(line);
+                    continue;
+                }
+                String description = descAndFrom[0].trim();
+                String[] fromAndTo = descAndFrom[1].split("/to", 2);
+                if (fromAndTo.length < 2 || fromAndTo[0].trim().isEmpty() || fromAndTo[1].trim().isEmpty()) {
+                    System.out.println(line);
+                    System.out.println("Format: event <description> /from <start> /to <end>");
+                    System.out.println(line);
+                    continue;
+                }
+                Task t = new Event(description, fromAndTo[0].trim(), fromAndTo[1].trim());
+                tasks.add(t);
+                System.out.println(line);
+                System.out.println("Got it. I've added this task:");
+                System.out.println("  " + t);
+                System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+                System.out.println(line);
+
+            } else {
+                System.out.println(line);
+                System.out.println("Unknown command. Try:\n  todo <desc>\n  deadline <desc> /by <when>\n  event <desc> /from <start> /to <end>\n  list | mark N | unmark N | bye");
                 System.out.println(line);
             }
         }
