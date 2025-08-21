@@ -1,7 +1,6 @@
 class Todo extends Task {
     Todo(String description) {
-        super(description);
+        super(description, TaskType.TODO);
     }
-    String getTypeSymbol() { return "T"; }
     String extraInfo() { return ""; }
 }

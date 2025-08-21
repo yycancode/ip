@@ -1,21 +1,54 @@
-public abstract class Task {
-    String description;
-    boolean done;
+enum Status {
+    DONE("[X]"),
+    NOT_DONE("[ ]");
 
-    Task(String description) {
-        this.description = description;
-        this.done = false;
+    private final String checkbox;
+
+    Status(String checkbox) {
+        this.checkbox = checkbox;
     }
-
-    void mark() { this.done = true; }
-    void unmark() { this.done = false; }
-    String checkbox() { return done ? "[X]" : "[ ]"; }
-
-    abstract String getTypeSymbol();   // "T", "D", or "E"
-    abstract String extraInfo();       // for deadline/event formatting
 
     @Override
     public String toString() {
-        return "[" + getTypeSymbol() + "]" + checkbox() + " " + description + extraInfo();
+        return checkbox;
+    }
+}
+
+enum TaskType {
+    TODO("T"),
+    DEADLINE("D"),
+    EVENT("E");
+
+    private final String symbol;
+
+    TaskType(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+}
+
+public abstract class Task {
+    String description;
+    Status status;
+    TaskType type;
+
+    Task(String description, TaskType type) {
+        this.description = description;
+        this.status = Status.NOT_DONE;
+        this.type = type;
+    }
+
+    void mark() { this.status = Status.DONE; }
+    void unmark() { this.status = Status.NOT_DONE; }
+    String checkbox() { return status.toString(); }
+
+    abstract String extraInfo();
+
+    @Override
+    public String toString() {
+        return "[" + type.getSymbol() + "]" + checkbox() + " " + description + extraInfo();
     }
 }
