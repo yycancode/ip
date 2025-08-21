@@ -156,6 +156,33 @@ public class YY {
                 System.out.println("Now you have " + tasks.size() + " tasks in the list.");
                 System.out.println(line);
 
+            } else if (input.equalsIgnoreCase("delete")) {
+                System.out.println(line);
+                System.out.println("Please provide a task number to delete. e.g., delete 2");
+                System.out.println(line);
+
+            } else if (input.toLowerCase().startsWith("delete ")) {
+                String idxStr = input.substring(7).trim();
+                try {
+                    int idx = Integer.parseInt(idxStr) - 1;
+                    if (idx < 0 || idx >= tasks.size()) {
+                        System.out.println(line);
+                        System.out.println("Invalid task number.");
+                        System.out.println(line);
+                    } else {
+                        Task removed = tasks.remove(idx);
+                        System.out.println(line);
+                        System.out.println("Noted. I've removed this task:");
+                        System.out.println("  " + removed);
+                        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+                        System.out.println(line);
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println(line);
+                    System.out.println("Please provide a valid task number to delete.");
+                    System.out.println(line);
+                }
+
             } else {
                 System.out.println(line);
                 System.out.println("Unknown Command. Try these commands instead!");
