@@ -15,6 +15,13 @@ public class YY {
         while (true) {
             String input = sc.nextLine().trim();
 
+            if (input.isEmpty()) {
+                System.out.println(line);
+                System.out.println("Please enter a command.");
+                System.out.println(line);
+                continue;
+            }
+
             if (input.equalsIgnoreCase("bye")) {
                 System.out.println(line);
                 System.out.println("Bye. Hope to see you again soon!");
@@ -76,6 +83,11 @@ public class YY {
                     System.out.println(line);
                 }
 
+            } else if (input.equalsIgnoreCase("todo")) {
+                System.out.println(line);
+                System.out.println("The description of a todo cannot be empty.");
+                System.out.println(line);
+
             } else if (input.toLowerCase().startsWith("todo ")) {
                 String desc = input.substring(5).trim();
                 if (desc.isEmpty()) {
@@ -92,12 +104,17 @@ public class YY {
                 System.out.println("Now you have " + tasks.size() + " tasks in the list.");
                 System.out.println(line);
 
+            } else if (input.equalsIgnoreCase("deadline")) {
+                System.out.println(line);
+                System.out.println("The deadline command needs '/by'. Format: deadline <description> /by <when>");
+                System.out.println(line);
+
             } else if (input.toLowerCase().startsWith("deadline ")) {
                 String rest = input.substring(9).trim();
                 String[] parts = rest.split("/by", 2);
                 if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
                     System.out.println(line);
-                    System.out.println("Format: deadline <description> /by <when>");
+                    System.out.println("The deadline command needs '/by'. Format: deadline <description> /by <when>");
                     System.out.println(line);
                     continue;
                 }
@@ -109,12 +126,17 @@ public class YY {
                 System.out.println("Now you have " + tasks.size() + " tasks in the list.");
                 System.out.println(line);
 
+            } else if (input.equalsIgnoreCase("event")) {
+                System.out.println(line);
+                System.out.println("The event command needs '/from' and '/to'. Format: event <description> /from <start> /to <end>");
+                System.out.println(line);
+
             } else if (input.toLowerCase().startsWith("event ")) {
                 String rest = input.substring(6).trim();
                 String[] descAndFrom = rest.split("/from", 2);
                 if (descAndFrom.length < 2 || descAndFrom[0].trim().isEmpty()) {
                     System.out.println(line);
-                    System.out.println("Format: event <description> /from <start> /to <end>");
+                    System.out.println("The event command needs '/from' and '/to'. Format: event <description> /from <start> /to <end>");
                     System.out.println(line);
                     continue;
                 }
@@ -122,7 +144,7 @@ public class YY {
                 String[] fromAndTo = descAndFrom[1].split("/to", 2);
                 if (fromAndTo.length < 2 || fromAndTo[0].trim().isEmpty() || fromAndTo[1].trim().isEmpty()) {
                     System.out.println(line);
-                    System.out.println("Format: event <description> /from <start> /to <end>");
+                    System.out.println("The event command needs '/from' and '/to'. Format: event <description> /from <start> /to <end>");
                     System.out.println(line);
                     continue;
                 }
@@ -136,7 +158,9 @@ public class YY {
 
             } else {
                 System.out.println(line);
-                System.out.println("Unknown command. Try:\n  todo <desc>\n  deadline <desc> /by <when>\n  event <desc> /from <start> /to <end>\n  list | mark N | unmark N | bye");
+                System.out.println("Unknown Command. Try these commands instead!");
+                System.out.println("todo <desc>\ndeadline <desc> /by <when>\nevent <desc> /from <start> /to <end>");
+                System.out.println("list | mark N | unmark N | bye");
                 System.out.println(line);
             }
         }
