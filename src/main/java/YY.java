@@ -19,7 +19,8 @@ public class YY {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        ArrayList<Task> tasks = new ArrayList<>();
+        Storage storage = new Storage();
+        ArrayList<Task> tasks = storage.load();
         String line = "________________________________________";
 
         System.out.println(line);
@@ -64,6 +65,7 @@ public class YY {
                         if (idx >= 0 && idx < tasks.size()) {
                             Task t = tasks.get(idx);
                             t.mark();
+                            storage.save(tasks);
                             System.out.println(line);
                             System.out.println("Nice! I've marked this task as done:");
                             System.out.println("  " + t);
@@ -86,6 +88,7 @@ public class YY {
                         if (idx >= 0 && idx < tasks.size()) {
                             Task t = tasks.get(idx);
                             t.unmark();
+                            storage.save(tasks);
                             System.out.println(line);
                             System.out.println("OK, I've marked this task as not done yet:");
                             System.out.println("  " + t);
@@ -118,6 +121,7 @@ public class YY {
                     }
                     Task t = new Todo(desc);
                     tasks.add(t);
+                    storage.save(tasks);
                     System.out.println(line);
                     System.out.println("Got it. I've added this task:");
                     System.out.println("  " + t);
@@ -142,6 +146,7 @@ public class YY {
                     }
                     Task t = new Deadline(parts[0].trim(), parts[1].trim());
                     tasks.add(t);
+                    storage.save(tasks);
                     System.out.println(line);
                     System.out.println("Got it. I've added this task:");
                     System.out.println("  " + t);
@@ -174,6 +179,7 @@ public class YY {
                     }
                     Task t = new Event(description, fromAndTo[0].trim(), fromAndTo[1].trim());
                     tasks.add(t);
+                    storage.save(tasks);
                     System.out.println(line);
                     System.out.println("Got it. I've added this task:");
                     System.out.println("  " + t);
@@ -197,6 +203,7 @@ public class YY {
                             System.out.println(line);
                         } else {
                             Task removed = tasks.remove(idx);
+                            storage.save(tasks);
                             System.out.println(line);
                             System.out.println("Noted. I've removed this task:");
                             System.out.println("  " + removed);
