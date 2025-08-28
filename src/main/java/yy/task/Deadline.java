@@ -1,3 +1,5 @@
+package yy.task;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -5,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 public class Deadline extends Task {
     LocalDateTime by;
 
-    Deadline(String description, String byRaw) {
+    public Deadline(String description, String byRaw) {
         super(description, TaskType.DEADLINE);
         this.by = parseDateTime(byRaw.trim());
     }
@@ -22,7 +24,7 @@ public class Deadline extends Task {
         return d.atStartOfDay();
     }
 
-    String getByIso() {
+    public String getByIso() {
         return by.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 

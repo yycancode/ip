@@ -1,3 +1,6 @@
+package yy.ui;
+
+import yy.task.TaskList;
 import java.util.Scanner;
 
 public class UI {
@@ -6,7 +9,7 @@ public class UI {
 
     public void showWelcome() {
         System.out.println(LINE);
-        System.out.println("Hello! I'm YY!");
+        System.out.println("Hello! I'm yy.YY!");
         System.out.println("What can I do for you?");
         System.out.println(LINE);
     }

@@ -1,3 +1,5 @@
+package yy.parser;
+
 public class Parser {
     public enum Command { BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, UNKNOWN }
 

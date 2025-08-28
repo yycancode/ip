@@ -1,3 +1,5 @@
+package yy.task;
+
 enum Status {
     DONE("[X]"),
     NOT_DONE("[ ]");
@@ -41,9 +43,10 @@ public abstract class Task {
         this.type = type;
     }
 
-    void mark() { this.status = Status.DONE; }
+    public void mark() { this.status = Status.DONE; }
     void unmark() { this.status = Status.NOT_DONE; }
-    String checkbox() { return status.toString(); }
+    public String checkbox() { return status.toString(); }
+    public String getDescription() {return this.description; }
 
     abstract String extraInfo();
 

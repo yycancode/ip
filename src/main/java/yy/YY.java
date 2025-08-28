@@ -1,3 +1,10 @@
+package yy;
+
+import yy.ui.UI;
+import yy.task.*;
+import yy.parser.Parser;
+import yy.storage.Storage;
+
 public class YY {
 
     public static void main(String[] args) {
@@ -19,17 +26,17 @@ public class YY {
             }
 
             switch (parser.parseCommand(input)) {
-                case BYE: {
+                case Parser.Command.BYE: {
                     ui.showLine();
                     ui.show("Bye. Hope to see you again soon!");
                     ui.showLine();
                     break outer;
                 }
-                case LIST: {
+                case Parser.Command.LIST: {
                     ui.showTaskList(tasks);
                     break;
                 }
-                case MARK: {
+                case Parser.Command.MARK: {
                     try {
                         int idx = Integer.parseInt(input.substring(5).trim()) - 1;
                         if (idx >= 0 && idx < tasks.size()) {
@@ -51,7 +58,7 @@ public class YY {
                     }
                     break;
                 }
-                case UNMARK: {
+                case Parser.Command.UNMARK: {
                     try {
                         int idx = Integer.parseInt(input.substring(7).trim()) - 1;
                         if (idx >= 0 && idx < tasks.size()) {
@@ -73,7 +80,7 @@ public class YY {
                     }
                     break;
                 }
-                case TODO: {
+                case Parser.Command.TODO: {
                     if (input.equalsIgnoreCase("todo")) {
                         ui.showLine();
                         ui.show("The description of a todo cannot be empty.");
@@ -97,7 +104,7 @@ public class YY {
                     ui.showLine();
                     break;
                 }
-                case DEADLINE: {
+                case Parser.Command.DEADLINE: {
                     if (input.equalsIgnoreCase("deadline")) {
                         ui.showLine();
                         ui.show("The deadline command needs '/by'. Format: deadline <description> /by <yyyy-MM-dd or d/M/yyyy HHmm>");
@@ -122,7 +129,7 @@ public class YY {
                     ui.showLine();
                     break;
                 }
-                case EVENT: {
+                case Parser.Command.EVENT: {
                     if (input.equalsIgnoreCase("event")) {
                         ui.showLine();
                         ui.show("The event command needs '/from' and '/to'. Format: event <description> /from <yyyy-MM-dd or d/M/yyyy HHmm> /to <yyyy-MM-dd or d/M/yyyy HHmm>");
@@ -155,7 +162,7 @@ public class YY {
                     ui.showLine();
                     break;
                 }
-                case DELETE: {
+                case Parser.Command.DELETE: {
                     if (input.equalsIgnoreCase("delete")) {
                         ui.showLine();
                         ui.show("Please provide a task number to delete. e.g., delete 2");
@@ -185,7 +192,7 @@ public class YY {
                     }
                     break;
                 }
-                case UNKNOWN: {
+                case Parser.Command.UNKNOWN: {
                     ui.showLine();
                     ui.show("Unknown Command. Try these commands instead!");
                     ui.show("todo <desc>\ndeadline <desc> /by <when>\nevent <desc> /from <start> /to <end>");

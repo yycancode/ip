@@ -1,3 +1,5 @@
+package yy.storage;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -6,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import yy.task.*;
 
 public final class Storage {
     private final Path file;
@@ -56,7 +59,6 @@ public final class Storage {
                         break;
                     }
                     case "E": {
-                        // we save Event as: E | done | desc | from | to
                         if (parts.length >= 5) {
                             String from = parts[3];
                             String to = parts[4];
@@ -117,11 +119,11 @@ public final class Storage {
         int d = done ? 1 : 0;
 
         if (t instanceof Todo) {
-            return "T | " + d + " | " + ((Todo) t).description;
+            return "T | " + d + " | " + ((Todo) t).getDescription();
         } else if (t instanceof Deadline dl) {
-            return "D | " + d + " | " + dl.description + " | " + dl.getByIso();
+            return "D | " + d + " | " + dl.getDescription() + " | " + dl.getByIso();
         } else if (t instanceof Event ev) {
-            return "E | " + d + " | " + ev.description + " | " + ev.getFromIso() + " | " + ev.getToIso();
+            return "E | " + d + " | " + ev.getDescription() + " | " + ev.getFromIso() + " | " + ev.getToIso();
         }
         return "T | " + d + " | " + t.toString();
     }

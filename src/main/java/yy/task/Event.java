@@ -1,3 +1,5 @@
+package yy.task;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -6,7 +8,7 @@ public class Event extends Task {
     LocalDateTime from;
     LocalDateTime to;
 
-    Event(String description, String fromRaw, String toRaw) {
+    public Event(String description, String fromRaw, String toRaw) {
         super(description, TaskType.EVENT);
         this.from = parseDateTime(fromRaw.trim());
         this.to = parseDateTime(toRaw.trim());
@@ -24,11 +26,11 @@ public class Event extends Task {
         return d.atStartOfDay();
     }
 
-    String getFromIso() {
+    public String getFromIso() {
         return from.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
-    String getToIso() {
+    public String getToIso() {
         return to.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
