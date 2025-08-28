@@ -76,25 +76,25 @@ public final class Storage {
 
                 Task t = null;
                 switch (type) {
-                    case "T": {
-                        t = new Todo(desc);
-                        break;
+                case "T": {
+                    t = new Todo(desc);
+                    break;
+                }
+                case "D": {
+                    if (parts.length >= 4) {
+                        String by = parts[3];
+                        t = new Deadline(desc, by);
                     }
-                    case "D": {
-                        if (parts.length >= 4) {
-                            String by = parts[3];
-                            t = new Deadline(desc, by);
-                        }
-                        break;
+                    break;
+                }
+                case "E": {
+                    if (parts.length >= 5) {
+                        String from = parts[3];
+                        String to = parts[4];
+                        t = new Event(desc, from, to);
                     }
-                    case "E": {
-                        if (parts.length >= 5) {
-                            String from = parts[3];
-                            String to = parts[4];
-                            t = new Event(desc, from, to);
-                        }
-                        break;
-                    }
+                    break;
+                }
                 }
                 if (t != null) {
                     if (isDone) t.mark();
