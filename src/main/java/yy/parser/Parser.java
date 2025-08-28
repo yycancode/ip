@@ -1,8 +1,26 @@
 package yy.parser;
 
+/**
+ * Parses raw user input strings into command types.
+ * <p>
+ * Responsible for identifying which command the user intended,
+ * such as todo, deadline, event, list, mark, unmark, delete, or bye.
+ */
+
 public class Parser {
+    /**
+     * Represents the different types of commands supported by the application.
+     */
     public enum Command { BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, UNKNOWN }
 
+    /**
+     * Parses a raw input string and returns the corresponding command type.
+     * <p>
+     * Matches against known command keywords and returns UNKNOWN if no match is found.
+     *
+     * @param input the raw user input string
+     * @return the identified Command type
+     */
     public Command parseCommand(String input) {
         String s = input.toLowerCase();
         if (s.equals("bye")) return Command.BYE;

@@ -5,7 +5,21 @@ import yy.task.*;
 import yy.parser.Parser;
 import yy.storage.Storage;
 
+/**
+ * Main entry point of the YY application.
+ * <p>
+ * This class wires together the Ui, Parser, TaskList, and Storage components.
+ * It runs the main command loop, reading user input, parsing commands,
+ * executing task operations, and persisting changes to disk.
+ */
+
 public class YY {
+
+    /**
+     * Launches the application.
+     *
+     * @param args command line arguments (not used)
+     */
 
     public static void main(String[] args) {
         UI ui = new UI();

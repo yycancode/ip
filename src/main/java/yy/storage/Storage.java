@@ -1,3 +1,4 @@
+
 package yy.storage;
 
 import java.io.BufferedWriter;
@@ -10,17 +11,45 @@ import java.util.ArrayList;
 import java.util.List;
 import yy.task.*;
 
+/**
+ * Handles loading and saving the task list to disk.
+ * <p>
+ * Uses a simple line-based format stored at a relative path (default: {@code data/yy.txt}).
+ * Lines are pipe-delimited with optional whitespace around the delimiter:
+ * <pre>
+ *   T | 0/1 | <description>
+ *   D | 0/1 | <description> | <by-ISO>
+ *   E | 0/1 | <description> | <from-ISO> | <to-ISO>
+ * </pre>
+ * where {@code 1} means done and {@code 0} means not done.
+ */
 public final class Storage {
     private final Path file;
 
+    /**
+     * Creates a Storage that reads from and writes to {@code data/yy.txt}.
+     */
     public Storage() {
         this(Paths.get("data", "yy.txt"));
     }
 
+    /**
+     * Creates a Storage instance backed by the given file path.
+     *
+     * @param file path to the data file to use
+     */
     public Storage(Path file) {
         this.file = file;
     }
 
+    /**
+     * Loads tasks from disk.
+     * <p>
+     * If the file (or its parent directory) does not exist, this method creates them and
+     * returns an empty list. Malformed lines are skipped.
+     *
+     * @return a list of tasks reconstructed from the save file
+     */
     public ArrayList<Task> load() {
         ensureParentFolder();
 
@@ -79,6 +108,14 @@ public final class Storage {
         return tasks;
     }
 
+    /**
+     * Saves the provided tasks to disk.
+     * <p>
+     * Writes to a temporary file and then moves it into place to reduce corruption risk.
+     * This is a best-effort operation; I/O errors are swallowed.
+     *
+     * @param tasks tasks to persist
+     */
     public void save(List<Task> tasks) {
         ensureParentFolder();
         List<String> lines = new ArrayList<>(tasks.size());
@@ -105,6 +142,9 @@ public final class Storage {
         }
     }
 
+    /**
+     * Ensures the parent directory for the data file exists, creating it if necessary.
+     */
     private void ensureParentFolder() {
         try {
             Path parent = file.getParent();
@@ -114,6 +154,12 @@ public final class Storage {
         } catch (IOException ignored) { }
     }
 
+    /**
+     * Converts a {@link Task} into its single-line save representation.
+     *
+     * @param t task to serialize
+     * @return line to be written to the save file
+     */
     private String serialize(Task t) {
         boolean done = "[X]".equals(t.checkbox());
         int d = done ? 1 : 0;
