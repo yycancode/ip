@@ -22,7 +22,6 @@ public final class Storage {
         ensureParentFolder();
 
         if (!Files.exists(file)) {
-            // First run: create an empty file and return empty list
             try {
                 Files.createFile(file);
             } catch (IOException ignored) { /* best effort */ }
@@ -114,19 +113,16 @@ public final class Storage {
     }
 
     private String serialize(Task t) {
-        // done flag via checkbox(): "[X]" => 1, "[ ]" => 0
         boolean done = "[X]".equals(t.checkbox());
         int d = done ? 1 : 0;
 
         if (t instanceof Todo) {
             return "T | " + d + " | " + ((Todo) t).description;
         } else if (t instanceof Deadline dl) {
-            return "D | " + d + " | " + dl.description + " | " + dl.by;
-        } else if (t instanceof Event) {
-            Event ev = (Event) t;
-            return "E | " + d + " | " + ev.description + " | " + ev.from + " | " + ev.to;
+            return "D | " + d + " | " + dl.description + " | " + dl.getByIso();
+        } else if (t instanceof Event ev) {
+            return "E | " + d + " | " + ev.description + " | " + ev.getFromIso() + " | " + ev.getToIso();
         }
-        // fallback (shouldn't happen)
         return "T | " + d + " | " + t.toString();
     }
 }
