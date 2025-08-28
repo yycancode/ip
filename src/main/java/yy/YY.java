@@ -192,6 +192,30 @@ public class YY {
                     }
                     break;
                 }
+                case FIND: {
+                    if (input.equalsIgnoreCase("find")) {
+                        ui.showLine();
+                        ui.show("Please provide a keyword to search for. e.g., find book");
+                        ui.showLine();
+                        break;
+                    }
+                    String keyword = input.substring(5).trim().toLowerCase();
+                    ui.showLine();
+                    ui.show("Here are the matching tasks in your list:");
+                    int count = 0;
+                    for (int i = 0; i < tasks.size(); i++) {
+                        Task t = tasks.get(i);
+                        if (t.getDescription().toLowerCase().contains(keyword)) {
+                            count++;
+                            ui.show(count + "." + t);
+                        }
+                    }
+                    if (count == 0) {
+                        ui.show("No matching tasks found.");
+                    }
+                    ui.showLine();
+                    break;
+                }
                 case UNKNOWN: {
                     ui.showLine();
                     ui.show("Unknown Command. Try these commands instead!");
