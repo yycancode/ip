@@ -11,7 +11,7 @@ public class Parser {
     /**
      * Represents the different types of commands supported by the application.
      */
-    public enum Command { BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, UNKNOWN }
+    public enum Command { BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, FIND, UNKNOWN }
 
     /**
      * Parses a raw input string and returns the corresponding command type.
@@ -31,6 +31,7 @@ public class Parser {
         if (s.equals("deadline") || s.startsWith("deadline ")) return Command.DEADLINE;
         if (s.equals("event") || s.startsWith("event ")) return Command.EVENT;
         if (s.equals("delete") || s.startsWith("delete ")) return Command.DELETE;
+        if (s.equals("find") || s.startsWith("find ")) return Command.FIND;
         return Command.UNKNOWN;
     }
 }
