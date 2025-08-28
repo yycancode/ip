@@ -6,10 +6,6 @@ import java.util.List;
 public class TaskList {
     private final ArrayList<Task> tasks;
 
-    public TaskList() {
-        this.tasks = new ArrayList<>();
-    }
-
     public TaskList(List<Task> loaded) {
         this.tasks = new ArrayList<>(loaded);
     }

@@ -119,12 +119,12 @@ public final class Storage {
         int d = done ? 1 : 0;
 
         if (t instanceof Todo) {
-            return "T | " + d + " | " + ((Todo) t).getDescription();
+            return "T | " + d + " | " + t.getDescription();
         } else if (t instanceof Deadline dl) {
             return "D | " + d + " | " + dl.getDescription() + " | " + dl.getByIso();
         } else if (t instanceof Event ev) {
             return "E | " + d + " | " + ev.getDescription() + " | " + ev.getFromIso() + " | " + ev.getToIso();
         }
-        return "T | " + d + " | " + t.toString();
+        return "T | " + d + " | " + t;
     }
 }

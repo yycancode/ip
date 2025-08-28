@@ -26,17 +26,17 @@ public class YY {
             }
 
             switch (parser.parseCommand(input)) {
-                case Parser.Command.BYE: {
+                case BYE: {
                     ui.showLine();
                     ui.show("Bye. Hope to see you again soon!");
                     ui.showLine();
                     break outer;
                 }
-                case Parser.Command.LIST: {
+                case LIST: {
                     ui.showTaskList(tasks);
                     break;
                 }
-                case Parser.Command.MARK: {
+                case MARK: {
                     try {
                         int idx = Integer.parseInt(input.substring(5).trim()) - 1;
                         if (idx >= 0 && idx < tasks.size()) {
@@ -58,7 +58,7 @@ public class YY {
                     }
                     break;
                 }
-                case Parser.Command.UNMARK: {
+                case UNMARK: {
                     try {
                         int idx = Integer.parseInt(input.substring(7).trim()) - 1;
                         if (idx >= 0 && idx < tasks.size()) {
@@ -80,7 +80,7 @@ public class YY {
                     }
                     break;
                 }
-                case Parser.Command.TODO: {
+                case TODO: {
                     if (input.equalsIgnoreCase("todo")) {
                         ui.showLine();
                         ui.show("The description of a todo cannot be empty.");
@@ -104,7 +104,7 @@ public class YY {
                     ui.showLine();
                     break;
                 }
-                case Parser.Command.DEADLINE: {
+                case DEADLINE: {
                     if (input.equalsIgnoreCase("deadline")) {
                         ui.showLine();
                         ui.show("The deadline command needs '/by'. Format: deadline <description> /by <yyyy-MM-dd or d/M/yyyy HHmm>");
@@ -129,7 +129,7 @@ public class YY {
                     ui.showLine();
                     break;
                 }
-                case Parser.Command.EVENT: {
+                case EVENT: {
                     if (input.equalsIgnoreCase("event")) {
                         ui.showLine();
                         ui.show("The event command needs '/from' and '/to'. Format: event <description> /from <yyyy-MM-dd or d/M/yyyy HHmm> /to <yyyy-MM-dd or d/M/yyyy HHmm>");
@@ -162,7 +162,7 @@ public class YY {
                     ui.showLine();
                     break;
                 }
-                case Parser.Command.DELETE: {
+                case DELETE: {
                     if (input.equalsIgnoreCase("delete")) {
                         ui.showLine();
                         ui.show("Please provide a task number to delete. e.g., delete 2");
@@ -192,7 +192,7 @@ public class YY {
                     }
                     break;
                 }
-                case Parser.Command.UNKNOWN: {
+                case UNKNOWN: {
                     ui.showLine();
                     ui.show("Unknown Command. Try these commands instead!");
                     ui.show("todo <desc>\ndeadline <desc> /by <when>\nevent <desc> /from <start> /to <end>");
