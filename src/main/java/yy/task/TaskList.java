@@ -1,6 +1,7 @@
 package yy.task;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -62,8 +63,8 @@ public class TaskList {
      *
      * @param t task to add
      */
-    public void add(Task t) {
-        tasks.add(t);
+    public void add(Task... t) {
+        tasks.addAll(Arrays.asList(t));
     }
 
     /**
