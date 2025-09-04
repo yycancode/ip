@@ -23,5 +23,7 @@ public class Todo extends Task {
      *
      * @return empty string
      */
-    String extraInfo() { return ""; }
+    String extraInfo() {
+        return "";
+    }
 }
