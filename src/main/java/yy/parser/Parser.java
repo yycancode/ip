@@ -11,7 +11,8 @@ public class Parser {
     /**
      * Represents the different types of commands supported by the application.
      */
-    public enum Command { BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, FIND, UNKNOWN }
+    public enum Command {
+        BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, FIND, UNKNOWN }
 
     /**
      * Parses a raw input string and returns the corresponding command type.
@@ -21,7 +22,7 @@ public class Parser {
      * @param input the raw user input string
      * @return the identified Command type
      */
-    public Command parseCommand(String input) {
+    public static Command parseCommand(String input) {
         String s = input.toLowerCase();
         if (s.equals("bye")) {
             return Command.BYE;
