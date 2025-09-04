@@ -1,4 +1,3 @@
-
 package yy.storage;
 
 import java.io.BufferedWriter;
@@ -9,7 +8,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import yy.task.*;
+
+import yy.task.Deadline;
+import yy.task.Event;
+import yy.task.Task;
+import yy.task.Todo;
 
 /**
  * Handles loading and saving the task list to disk.
@@ -17,9 +20,9 @@ import yy.task.*;
  * Uses a simple line-based format stored at a relative path (default: {@code data/yy.txt}).
  * Lines are pipe-delimited with optional whitespace around the delimiter:
  * <pre>
- *   T | 0/1 | <description>
- *   D | 0/1 | <description> | <by-ISO>
- *   E | 0/1 | <description> | <from-ISO> | <to-ISO>
+ *   T | 0/1 | &lt;description&gt;
+ *   D | 0/1 | &lt;description&gt; | &lt;by-ISO&gt;
+ *   E | 0/1 | &lt;description&gt; | &lt;from-ISO&gt; | &lt;to-ISO&gt;
  * </pre>
  * where {@code 1} means done and {@code 0} means not done.
  */
@@ -56,7 +59,10 @@ public final class Storage {
         if (!Files.exists(file)) {
             try {
                 Files.createFile(file);
-            } catch (IOException ignored) { /* best effort */ }
+            } catch (IOException e) {
+                // Best-effort: if file creation fails, log and continue with empty list
+                System.err.println("[Storage] Could not create save file: " + e.getMessage());
+            }
             return new ArrayList<>();
         }
 
@@ -65,10 +71,14 @@ public final class Storage {
             List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
             for (String raw : lines) {
                 String line = raw.trim();
-                if (line.isEmpty()) continue;
+                if (line.isEmpty()) {
+                    continue;
+                }
 
                 String[] parts = line.split("\\s*\\|\\s*");
-                if (parts.length < 3) continue;
+                if (parts.length < 3) {
+                    continue;
+                }
 
                 String type = parts[0];
                 boolean isDone = "1".equals(parts[1]);
@@ -95,9 +105,12 @@ public final class Storage {
                     }
                     break;
                 }
+                default:
                 }
                 if (t != null) {
-                    if (isDone) t.mark();
+                    if (isDone) {
+                        t.mark();
+                    }
                     tasks.add(t);
                 }
             }
@@ -133,12 +146,15 @@ public final class Storage {
             return; // best effort: silently skip on save failure
         }
         try {
-            Files.move(tmp, file, java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            Files.move(tmp, file, java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
             // fallback if atomic move not supported
             try {
                 Files.move(tmp, file, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException ignored) { }
+            } catch (IOException e2) {
+                System.err.println("[Storage] Save failed during fallback move: " + e2.getMessage());
+            }
         }
     }
 
@@ -151,7 +167,9 @@ public final class Storage {
             if (parent != null && !Files.exists(parent)) {
                 Files.createDirectories(parent);
             }
-        } catch (IOException ignored) { }
+        } catch (IOException e) {
+            System.err.println("[Storage] Could not create data directory: " + e.getMessage());
+        }
     }
 
     /**

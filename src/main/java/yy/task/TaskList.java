@@ -16,7 +16,9 @@ public class TaskList {
     /**
      * Constructs an empty TaskList.
      */
-    public TaskList() { this.tasks = new ArrayList<>(); }
+    public TaskList() {
+        this.tasks = new ArrayList<>();
+    }
 
     /**
      * Constructs a TaskList preloaded with tasks.
@@ -32,14 +34,18 @@ public class TaskList {
      *
      * @return task count
      */
-    public int size() { return tasks.size(); }
+    public int size() {
+        return tasks.size();
+    }
 
     /**
      * Checks if the task list is empty.
      *
      * @return true if no tasks are present, false otherwise
      */
-    public boolean isEmpty() { return tasks.isEmpty(); }
+    public boolean isEmpty() {
+        return tasks.isEmpty();
+    }
 
     /**
      * Returns the task at the specified index.
@@ -47,14 +53,18 @@ public class TaskList {
      * @param i index of the task to retrieve
      * @return task at the given index
      */
-    public Task get(int i) { return tasks.get(i); }
+    public Task get(int i) {
+        return tasks.get(i);
+    }
 
     /**
      * Adds a task to the list.
      *
      * @param t task to add
      */
-    public void add(Task t) { tasks.add(t); }
+    public void add(Task t) {
+        tasks.add(t);
+    }
 
     /**
      * Removes and returns the task at the specified index.
@@ -62,26 +72,34 @@ public class TaskList {
      * @param idx index of the task to remove
      * @return removed task
      */
-    public Task removeAt(int idx) { return tasks.remove(idx); }
+    public Task removeAt(int idx) {
+        return tasks.remove(idx);
+    }
 
     /**
      * Marks the task at the specified index as done.
      *
      * @param idx index of the task to mark
      */
-    public void mark(int idx) { tasks.get(idx).mark(); }
+    public void mark(int idx) {
+        tasks.get(idx).mark();
+    }
 
     /**
      * Marks the task at the specified index as not done.
      *
      * @param idx index of the task to unmark
      */
-    public void unmark(int idx) { tasks.get(idx).unmark(); }
+    public void unmark(int idx) {
+        tasks.get(idx).unmark();
+    }
 
     /**
      * Returns the underlying list of tasks.
      *
      * @return ArrayList of tasks
      */
-    public ArrayList<Task> asList() { return tasks; }
+    public ArrayList<Task> asList() {
+        return tasks;
+    }
 }

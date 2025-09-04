@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
  */
 
 public class Deadline extends Task {
-    LocalDateTime by;
+    private final LocalDateTime by;
 
     /**
      * Constructs a new Deadline task with the specified description and raw date/time string.
@@ -40,10 +40,16 @@ public class Deadline extends Task {
         try {
             DateTimeFormatter f = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
             return LocalDateTime.parse(raw, f);
-        } catch (Exception ignored) { }
+        } catch (Exception e) {
+            System.err.println("[Deadline] Failed to parse date/time in 'd/M/yyyy HHmm' format: "
+                    + e.getMessage());
+        }
         try {
             return LocalDateTime.parse(raw);
-        } catch (Exception ignored) { }
+        } catch (Exception e) {
+            System.err.println("[Deadline] Failed to parse date/time in ISO format: "
+                    + e.getMessage());
+        }
         LocalDate d = LocalDate.parse(raw);
         return d.atStartOfDay();
     }

@@ -42,9 +42,9 @@ enum TaskType {
  */
 
 public abstract class Task {
-    String description;
-    Status status;
-    TaskType type;
+    private final String description;
+    private Status status;
+    private final TaskType type;
 
     /**
      * Constructs a new Task with the given description and type.
@@ -62,26 +62,34 @@ public abstract class Task {
     /**
      * Marks this task as done.
      */
-    public void mark() { this.status = Status.DONE; }
+    public void mark() {
+        this.status = Status.DONE;
+    }
 
     /**
      * Marks this task as not done.
      */
-    void unmark() { this.status = Status.NOT_DONE; }
+    void unmark() {
+        this.status = Status.NOT_DONE;
+    }
 
     /**
      * Returns the checkbox symbol representing the task's status.
      *
      * @return "[X]" if done, "[ ]" if not done
      */
-    public String checkbox() { return status.toString(); }
+    public String checkbox() {
+        return status.toString();
+    }
 
     /**
      * Returns the description of this task.
      *
      * @return task description
      */
-    public String getDescription() {return this.description; }
+    public String getDescription() {
+        return this.description;
+    }
 
     /**
      * Returns additional information specific to the concrete task type,

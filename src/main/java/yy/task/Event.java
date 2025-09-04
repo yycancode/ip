@@ -13,8 +13,8 @@ import java.time.format.DateTimeFormatter;
  */
 
 public class Event extends Task {
-    LocalDateTime from;
-    LocalDateTime to;
+    private final LocalDateTime from;
+    private final LocalDateTime to;
 
     /**
      * Constructs a new Event with the specified description, start time, and end time.
@@ -43,10 +43,16 @@ public class Event extends Task {
         try {
             DateTimeFormatter f = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
             return LocalDateTime.parse(raw, f);
-        } catch (Exception ignored) { }
+        } catch (Exception e) {
+            System.err.println("[Event] Failed to parse date/time in 'd/M/yyyy HHmm' format: "
+                    + e.getMessage());
+        }
         try {
             return LocalDateTime.parse(raw);
-        } catch (Exception ignored) { }
+        } catch (Exception e) {
+            System.err.println("[Event] Failed to parse date/time in ISO format: "
+                    + e.getMessage());
+        }
         LocalDate d = LocalDate.parse(raw);
         return d.atStartOfDay();
     }
