@@ -7,6 +7,9 @@ import yy.task.TaskList;
 import yy.task.Todo;
 import yy.ui.UI;
 import java.util.List;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 
 /**
  * Represents the Duke chatbot application that interacts with users by processing
@@ -21,6 +24,7 @@ public class Duke {
     private final Storage storage = new Storage();
     private final TaskList tasks = new TaskList(storage.load());
     private final Parser parser = new Parser();
+    private final Deque<List<Task>> undoStack = new ArrayDeque<>();
 
     public static void main(String[] args) {
         ui.showWelcome();
@@ -65,6 +69,7 @@ public class Duke {
                     .orElse(null);
 
                 if (taskToMark != null) {
+                    undoStack.push(new ArrayList<>(tasks.asList()));
                     tasks.mark(idx);  // assuming 'mark' takes care of marking task
                     storage.save(tasks.asList());
                     result += "Nice! I've marked this task as done:\n";
@@ -81,6 +86,7 @@ public class Duke {
             try {
                 int idx = Integer.parseInt(input.substring(7).trim()) - 1;
                 if (idx >= 0 && idx < tasks.size()) {
+                    undoStack.push(new ArrayList<>(tasks.asList()));
                     tasks.unmark(idx);
                     storage.save(tasks.asList());
                     result += "OK, I've marked this task as not done yet:\n";
@@ -103,6 +109,7 @@ public class Duke {
                 result += "The description of a todo cannot be empty.\n";
                 break;
             }
+            undoStack.push(new ArrayList<>(tasks.asList()));
             Task t = new Todo(desc);
             tasks.add(t);
             storage.save(tasks.asList());
@@ -124,6 +131,7 @@ public class Duke {
                         + "/by <yyyy-MM-dd or d/M/yyyy HHmm>\n";
                 break;
             }
+            undoStack.push(new ArrayList<>(tasks.asList()));
             Task t = new Deadline(parts[0].trim(), parts[1].trim());
             tasks.add(t);
             storage.save(tasks.asList());
@@ -152,6 +160,7 @@ public class Duke {
                         + "/from <yyyy-MM-dd or d/M/yyyy HHmm> /to <yyyy-MM-dd or d/M/yyyy HHmm>\n";
                 break;
             }
+            undoStack.push(new ArrayList<>(tasks.asList()));
             Task t = new Event(description, fromAndTo[0].trim(), fromAndTo[1].trim());
             tasks.add(t);
             storage.save(tasks.asList());
@@ -174,6 +183,7 @@ public class Duke {
                     .findFirst()
                     .orElse(null);
                 if (removed != null) {
+                    undoStack.push(new ArrayList<>(tasks.asList()));
                     tasks.asList().remove(removed);
                     storage.save(tasks.asList());
                     result += "Noted. I've removed this task:\n";
@@ -204,6 +214,19 @@ public class Duke {
                 for (int i = 0; i < matchingTasks.size(); i++) {
                     result += (i + 1) + ". " + matchingTasks.get(i);
                 }
+            }
+            break;
+        }
+        case UNDO: {
+            if (undoStack.isEmpty()) {
+                result += "No actions to undo.\n";
+            } else {
+                // Undo the last action
+                List<Task> previousState = undoStack.pop();
+                tasks.asList().clear();
+                tasks.asList().addAll(previousState);
+                storage.save(tasks.asList());
+                result += "Undo successful. The task list has been restored.\n";
             }
             break;
         }
