@@ -6,6 +6,7 @@ import yy.task.Task;
 import yy.task.TaskList;
 import yy.task.Todo;
 import yy.ui.UI;
+import java.util.List;
 
 public class Duke {
 
@@ -43,11 +44,16 @@ public class Duke {
         case MARK: {
             try {
                 int idx = Integer.parseInt(input.substring(5).trim()) - 1;
-                if (idx >= 0 && idx < tasks.size()) {
-                    tasks.mark(idx);
+                Task taskToMark = tasks.asList().stream()
+                    .skip(idx)
+                    .findFirst()
+                    .orElse(null);
+
+                if (taskToMark != null) {
+                    tasks.mark(idx);  // assuming 'mark' takes care of marking task
                     storage.save(tasks.asList());
                     result += "Nice! I've marked this task as done:\n";
-                    result += (idx + 1) + ". " + tasks.get(idx);
+                    result += (idx + 1) + ". " + taskToMark;
                 } else {
                     result += "Invalid task number.\n";
                 }
@@ -147,10 +153,13 @@ public class Duke {
             String idxStr = input.substring(7).trim();
             try {
                 int idx = Integer.parseInt(idxStr) - 1;
-                if (idx < 0 || idx >= tasks.size()) {
-                    result += "Invalid task number.\n";
-                } else {
-                    Task removed = tasks.removeAt(idx);
+                // Use stream to find and remove the task
+                Task removed = tasks.asList().stream()
+                    .skip(idx)
+                    .findFirst()
+                    .orElse(null);
+                if (removed != null) {
+                    tasks.asList().remove(removed);
                     storage.save(tasks.asList());
                     result += "Noted. I've removed this task:\n";
                     result += "  " + removed;
@@ -168,16 +177,18 @@ public class Duke {
             }
             String keyword = input.substring(5).trim().toLowerCase();
             result += "Here are the matching tasks in your list:\n";
-            int count = 0;
-            for (int i = 0; i < tasks.size(); i++) {
-                Task t = tasks.get(i);
-                if (t.getDescription().toLowerCase().contains(keyword)) {
-                    count++;
-                    result += count + "." + t;
-                }
-            }
-            if (count == 0) {
+
+            // Use stream to filter tasks by keyword
+            List<Task> matchingTasks = tasks.asList().stream()
+                .filter(t -> t.getDescription().toLowerCase().contains(keyword))
+                .toList();
+
+            if (matchingTasks.isEmpty()) {
                 result += "No matching tasks found.\n";
+            } else {
+                for (int i = 0; i < matchingTasks.size(); i++) {
+                    result += (i + 1) + ". " + matchingTasks.get(i);
+                }
             }
             break;
         }
