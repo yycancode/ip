@@ -8,10 +8,16 @@ import yy.task.Todo;
 import yy.ui.UI;
 import java.util.List;
 
+/**
+ * Represents the Duke chatbot application that interacts with users by processing
+ * commands related to tasks (e.g., adding tasks, marking them, finding them, etc.).
+ * The application handles tasks of type TODO, DEADLINE, EVENT, and others, managing them
+ * with the help of task storage and UI components.
+ */
 public class Duke {
 
-    private String commandType;
     private static final UI ui = new UI();
+    private String commandType;
     private final Storage storage = new Storage();
     private final TaskList tasks = new TaskList(storage.load());
     private final Parser parser = new Parser();
@@ -21,7 +27,13 @@ public class Duke {
     }
 
     /**
-     * Generates a response for the user's chat message.
+     * Processes the user's input and generates an appropriate response based on the command.
+     * Handles commands such as TODO, DEADLINE, EVENT, MARK, UNMARK, DELETE, FIND, etc.
+     * Validates the input and performs actions accordingly, such as adding tasks, updating task status,
+     * or providing feedback to the user.
+     *
+     * @param input The user input command string.
+     * @return A string containing the result of processing the user's command.
      */
     public String getResponse(String input) {
         assert input != null : "input must not be null";
@@ -206,6 +218,11 @@ public class Duke {
         return result;
     }
 
+    /**
+     * Returns the type of the most recent command parsed by the Duke application.
+     *
+     * @return The type of the command (e.g., TODO, DEADLINE, etc.).
+     */
     public String getCommandType() {
         return commandType;
     }
