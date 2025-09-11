@@ -22,7 +22,7 @@ public class Parser {
      * @param input the raw user input string
      * @return the identified Command type
      */
-    public static Command parseCommand(String input) {
+    public Command parseCommand(String input) {
         String s = input.toLowerCase();
         if (s.equals("bye")) {
             return Command.BYE;

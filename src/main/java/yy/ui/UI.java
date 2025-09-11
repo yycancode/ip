@@ -17,10 +17,18 @@ public class UI {
     /**
      * Displays the welcome message when the application starts.
      */
-    public void showWelcome() {
-        System.out.println(LINE);
-        System.out.println("Hello! I'm YY!");
-        System.out.println("What can I do for you?");
+    public String showWelcome() {
+        String result = "";
+        result += "Hello! I'm YY!";
+        result += "What can I do for you?";
+
+        return result;
+    }
+
+    /**
+     * Prints a horizontal line divider to the console.
+     */
+    public void showLine() {
         System.out.println(LINE);
     }
 
@@ -31,13 +39,6 @@ public class UI {
      */
     public String readCommand() {
         return sc.nextLine().trim();
-    }
-
-    /**
-     * Prints a horizontal line divider to the console.
-     */
-    public void showLine() {
-        System.out.println(LINE);
     }
 
     /**
@@ -55,16 +56,18 @@ public class UI {
      *
      * @param tasks the TaskList to display
      */
-    public void showTaskList(TaskList tasks) {
-        showLine();
+    public String showTaskList(TaskList tasks) {
+        String result = "";
         if (tasks.isEmpty()) {
-            show("Your list is empty.");
+            result += "Your list is empty.";
         } else {
-            show("Here are the tasks in your list:");
+            result += "Here are the tasks in your list:\n";
             for (int i = 0; i < tasks.size(); i++) {
-                System.out.println((i + 1) + "." + tasks.get(i));
+                result += (i + 1);
+                result += ". ";
+                result += tasks.get(i);
             }
         }
-        showLine();
+        return result;
     }
 }
