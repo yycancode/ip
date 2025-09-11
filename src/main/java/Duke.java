@@ -24,6 +24,7 @@ public class Duke {
      * Generates a response for the user's chat message.
      */
     public String getResponse(String input) {
+        assert input != null : "input must not be null";
         Parser.Command c = parser.parseCommand(input);
         commandType = c.getClass().getSimpleName();
         String result = "";
@@ -31,6 +32,8 @@ public class Duke {
         if (input.isEmpty()) {
             return ("Please enter a command.\n");
         }
+
+        assert tasks.size() >= 0 : "Task list size cannot be negative";
 
         switch (c) {
         case BYE: {
