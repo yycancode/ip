@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.Deque;
 
 /**
- * Represents the Duke chatbot application that interacts with users by processing
+ * Represents the YY chatbot application that interacts with users by processing
  * commands related to tasks (e.g., adding tasks, marking them, finding them, etc.).
  * The application handles tasks of type TODO, DEADLINE, EVENT, and others, managing them
  * with the help of task storage and UI components.
  */
-public class Duke {
+public class YY {
 
     private static final UI ui = new UI();
     private String commandType;
