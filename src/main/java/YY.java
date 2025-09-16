@@ -1,3 +1,8 @@
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
+
 import yy.parser.Parser;
 import yy.storage.Storage;
 import yy.task.Deadline;
@@ -6,10 +11,6 @@ import yy.task.Task;
 import yy.task.TaskList;
 import yy.task.Todo;
 import yy.ui.UI;
-import java.util.List;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
 
 /**
  * Represents the YY chatbot application that interacts with users by processing
@@ -52,193 +53,218 @@ public class YY {
         assert tasks.size() >= 0 : "Task list size cannot be negative";
 
         switch (c) {
-        case BYE: {
-            result += "Bye. Hope to see you again soon!\n";
+        case BYE:
+            result += handleBye();
             break;
-        }
-        case LIST: {
-            result += ui.showTaskList(tasks);
+        case LIST:
+            result += handleList();
             break;
-        }
-        case MARK: {
-            try {
-                int idx = Integer.parseInt(input.substring(5).trim()) - 1;
-                Task taskToMark = tasks.asList().stream()
-                    .skip(idx)
-                    .findFirst()
-                    .orElse(null);
-
-                if (taskToMark != null) {
-                    undoStack.push(new ArrayList<>(tasks.asList()));
-                    tasks.mark(idx);  // assuming 'mark' takes care of marking task
-                    storage.save(tasks.asList());
-                    result += "Nice! I've marked this task as done:\n";
-                    result += (idx + 1) + ". " + taskToMark;
-                } else {
-                    result += "Invalid task number.\n";
-                }
-            } catch (NumberFormatException e) {
-                result += "Please provide a task number, e.g., mark 2\n";
-            }
+        case MARK:
+            result += handleMark(input);
             break;
-        }
-        case UNMARK: {
-            try {
-                int idx = Integer.parseInt(input.substring(7).trim()) - 1;
-                if (idx >= 0 && idx < tasks.size()) {
-                    undoStack.push(new ArrayList<>(tasks.asList()));
-                    tasks.unmark(idx);
-                    storage.save(tasks.asList());
-                    result += "OK, I've marked this task as not done yet:\n";
-                    result += (idx + 1) + ". " + tasks.get(idx);
-                } else {
-                    result += "Invalid task number.";
-                }
-            } catch (NumberFormatException e) {
-                result += "Please provide a task number, e.g., unmark 2\n";
-            }
+        case UNMARK:
+            result += handleUnmark(input);
             break;
-        }
-        case TODO: {
-            if (input.equalsIgnoreCase("todo")) {
-                result += "The description of a todo cannot be empty.\n";
-                break;
-            }
-            String desc = input.substring(5).trim();
-            if (desc.isEmpty()) {
-                result += "The description of a todo cannot be empty.\n";
-                break;
-            }
-            undoStack.push(new ArrayList<>(tasks.asList()));
-            Task t = new Todo(desc);
-            tasks.add(t);
-            storage.save(tasks.asList());
-            result += "Got it. I've added this task:\n";
-            result += "  " + t;
-            result += "Now you have " + tasks.size() + " tasks in the list.\n";
+        case TODO:
+            result += handleTodo(input);
             break;
-        }
-        case DEADLINE: {
-            if (input.equalsIgnoreCase("deadline")) {
-                result += "The deadline command needs '/by'. Format: deadline <description>"
-                        + "/by <yyyy-MM-dd or d/M/yyyy HHmm>\n";
-                break;
-            }
-            String rest = input.substring(9).trim();
-            String[] parts = rest.split("/by", 2);
-            if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
-                result += "The deadline command needs '/by'. Format: deadline <description>"
-                        + "/by <yyyy-MM-dd or d/M/yyyy HHmm>\n";
-                break;
-            }
-            undoStack.push(new ArrayList<>(tasks.asList()));
-            Task t = new Deadline(parts[0].trim(), parts[1].trim());
-            tasks.add(t);
-            storage.save(tasks.asList());
-            result += "Got it. I've added this task:\n";
-            result += "  " + t;
-            result += "Now you have " + tasks.size() + " tasks in the list.\n";
+        case DEADLINE:
+            result += handleDeadline(input);
             break;
-        }
-        case EVENT: {
-            if (input.equalsIgnoreCase("event")) {
-                result += "The event command needs '/from' and '/to'. Format: event <description>"
-                        + "/from <yyyy-MM-dd or d/M/yyyy HHmm> /to <yyyy-MM-dd or d/M/yyyy HHmm>\n";
-                break;
-            }
-            String rest = input.substring(6).trim();
-            String[] descAndFrom = rest.split("/from", 2);
-            if (descAndFrom.length < 2 || descAndFrom[0].trim().isEmpty()) {
-                result += "The event command needs '/from' and '/to'. Format: event <description>"
-                        + "/from <yyyy-MM-dd or d/M/yyyy HHmm> /to <yyyy-MM-dd or d/M/yyyy HHmm>\n";
-                break;
-            }
-            String description = descAndFrom[0].trim();
-            String[] fromAndTo = descAndFrom[1].split("/to", 2);
-            if (fromAndTo.length < 2 || fromAndTo[0].trim().isEmpty() || fromAndTo[1].trim().isEmpty()) {
-                result += "The event command needs '/from' and '/to'. Format: event <description>"
-                        + "/from <yyyy-MM-dd or d/M/yyyy HHmm> /to <yyyy-MM-dd or d/M/yyyy HHmm>\n";
-                break;
-            }
-            undoStack.push(new ArrayList<>(tasks.asList()));
-            Task t = new Event(description, fromAndTo[0].trim(), fromAndTo[1].trim());
-            tasks.add(t);
-            storage.save(tasks.asList());
-            result += "Got it. I've added this task:\n";
-            result += "  " + t;
-            result += "Now you have " + tasks.size() + " tasks in the list.\n";
+        case EVENT:
+            result += handleEvent(input);
             break;
-        }
-        case DELETE: {
-            if (input.equalsIgnoreCase("delete")) {
-                result += "Please provide a task number to delete. e.g., delete 2\n";
-                break;
-            }
-            String idxStr = input.substring(7).trim();
-            try {
-                int idx = Integer.parseInt(idxStr) - 1;
-                // Use stream to find and remove the task
-                Task removed = tasks.asList().stream()
-                    .skip(idx)
-                    .findFirst()
-                    .orElse(null);
-                if (removed != null) {
-                    undoStack.push(new ArrayList<>(tasks.asList()));
-                    tasks.asList().remove(removed);
-                    storage.save(tasks.asList());
-                    result += "Noted. I've removed this task:\n";
-                    result += "  " + removed;
-                    result += "Now you have " + tasks.size() + " tasks in the list.\n";
-                }
-            } catch (NumberFormatException e) {
-                result += "Please provide a valid task number to delete.\n";
-            }
+        case DELETE:
+            result += handleDelete(input);
             break;
-        }
-        case FIND: {
-            if (input.equalsIgnoreCase("find")) {
-                result += "Please provide a keyword to search for. e.g., find book\n";
-                break;
-            }
-            String keyword = input.substring(5).trim().toLowerCase();
-            result += "Here are the matching tasks in your list:\n";
-
-            // Use stream to filter tasks by keyword
-            List<Task> matchingTasks = tasks.asList().stream()
-                .filter(t -> t.getDescription().toLowerCase().contains(keyword))
-                .toList();
-
-            if (matchingTasks.isEmpty()) {
-                result += "No matching tasks found.\n";
-            } else {
-                for (int i = 0; i < matchingTasks.size(); i++) {
-                    result += (i + 1) + ". " + matchingTasks.get(i);
-                }
-            }
+        case FIND:
+            result += handleFind(input);
             break;
-        }
-        case UNDO: {
-            if (undoStack.isEmpty()) {
-                result += "No actions to undo.\n";
-            } else {
-                // Undo the last action
-                List<Task> previousState = undoStack.pop();
-                tasks.asList().clear();
-                tasks.asList().addAll(previousState);
-                storage.save(tasks.asList());
-                result += "Undo successful. The task list has been restored.\n";
-            }
+        case UNDO:
+            result += handleUndo();
             break;
-        }
-        case UNKNOWN: {
-            result += "Unknown Command. Try these commands instead!\n";
-            result += "todo <desc>\ndeadline <desc> /by <when>\nevent <desc> /from <start> /to <end>\n";
-            result += "list | mark N | unmark N | bye\n";
+        case UNKNOWN:
+            result += handleUnknown();
             break;
-        }
         default:
         }
         return result;
+    }
+
+    // ==== Command handlers (each returns a user-facing message) ====
+
+    private String handleBye() {
+        return "Bye. Hope to see you again soon!\n";
+    }
+
+    private String handleList() {
+        return ui.showTaskList(tasks);
+    }
+
+    private String handleMark(String input) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            int idx = Integer.parseInt(input.substring(5).trim()) - 1;
+            Task taskToMark = (idx >= 0 && idx < tasks.size()) ? tasks.get(idx) : null;
+            if (taskToMark != null) {
+                undoStack.push(new ArrayList<>(tasks.asList()));
+                tasks.mark(idx);
+                storage.save(tasks.asList());
+                sb.append("Nice! I've marked this task as done:\n")
+                  .append(idx + 1).append(". ").append(taskToMark);
+            } else {
+                sb.append("Invalid task number.\n");
+            }
+        } catch (NumberFormatException e) {
+            sb.append("Please provide a task number, e.g., mark 2\n");
+        }
+        return sb.toString();
+    }
+
+    private String handleUnmark(String input) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            int idx = Integer.parseInt(input.substring(7).trim()) - 1;
+            if (idx >= 0 && idx < tasks.size()) {
+                undoStack.push(new ArrayList<>(tasks.asList()));
+                tasks.unmark(idx);
+                storage.save(tasks.asList());
+                sb.append("OK, I've marked this task as not done yet:\n")
+                  .append(idx + 1).append(". ").append(tasks.get(idx));
+            } else {
+                sb.append("Invalid task number.\n");
+            }
+        } catch (NumberFormatException e) {
+            sb.append("Please provide a task number, e.g., unmark 2\n");
+        }
+        return sb.toString();
+    }
+
+    private String handleTodo(String input) {
+        String errorMsg = "The todo command needs a description. Format: todo <description>\n";
+        if (input.equalsIgnoreCase("todo")) {
+            return errorMsg;
+        }
+        String desc = input.substring(5).trim();
+        if (desc.isEmpty()) {
+            return errorMsg;
+        }
+        undoStack.push(new ArrayList<>(tasks.asList()));
+        Task t = new Todo(desc);
+        tasks.add(t);
+        storage.save(tasks.asList());
+        return "Got it. I've added this task:\n"
+                + "  " + t + System.lineSeparator()
+                + "Now you have " + tasks.size() + " tasks in the list.\n";
+    }
+
+    private String handleDeadline(String input) {
+        String errorMsg = "The deadline command needs '/by'."
+            + "Format: deadline <description>/by <yyyy-MM-dd or d/M/yyyy HHmm>\n";
+
+        if (input.equalsIgnoreCase("deadline")) {
+            return errorMsg;
+        }
+        String rest = input.substring(9).trim();
+        String[] parts = rest.split("/by", 2);
+        if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
+            return errorMsg;
+        }
+        undoStack.push(new ArrayList<>(tasks.asList()));
+        Task t = new Deadline(parts[0].trim(), parts[1].trim());
+        tasks.add(t);
+        storage.save(tasks.asList());
+        return "Got it. I've added this task:\n"
+                + "  " + t + System.lineSeparator()
+                + "Now you have " + tasks.size() + " tasks in the list.\n";
+    }
+
+    private String handleEvent(String input) {
+        String errorMsg = "The event command needs '/from' and '/to'."
+            + "Format: event <description>/from <yyyy-MM-dd or d/M/yyyy HHmm> /to <yyyy-MM-dd or d/M/yyyy HHmm>\n";
+
+        if (input.equalsIgnoreCase("event")) {
+            return errorMsg;
+        }
+        String rest = input.substring(6).trim();
+        String[] descAndFrom = rest.split("/from", 2);
+        if (descAndFrom.length < 2 || descAndFrom[0].trim().isEmpty()) {
+            return errorMsg;
+        }
+        String description = descAndFrom[0].trim();
+        String[] fromAndTo = descAndFrom[1].split("/to", 2);
+        if (fromAndTo.length < 2 || fromAndTo[0].trim().isEmpty() || fromAndTo[1].trim().isEmpty()) {
+            return errorMsg;
+        }
+        undoStack.push(new ArrayList<>(tasks.asList()));
+        Task t = new Event(description, fromAndTo[0].trim(), fromAndTo[1].trim());
+        tasks.add(t);
+        storage.save(tasks.asList());
+        return "Got it. I've added this task:\n"
+                + "  " + t + System.lineSeparator()
+                + "Now you have " + tasks.size() + " tasks in the list.\n";
+    }
+
+    private String handleDelete(String input) {
+        String errorMsg = "The delete command needs a task number. Format: delete <task number>\n";
+
+        if (input.equalsIgnoreCase("delete")) {
+            return errorMsg;
+        }
+        String idxStr = input.substring(7).trim();
+        try {
+            int idx = Integer.parseInt(idxStr) - 1;
+            if (idx < 0 || idx >= tasks.size()) {
+                return errorMsg;
+            }
+            Task removed = tasks.get(idx);
+            undoStack.push(new ArrayList<>(tasks.asList()));
+            tasks.asList().remove(idx);
+            storage.save(tasks.asList());
+            return "Noted. I've removed this task:\n"
+                    + "  " + removed + System.lineSeparator()
+                    + "Now you have " + tasks.size() + " tasks in the list.\n";
+        } catch (NumberFormatException e) {
+            return errorMsg;
+        }
+    }
+
+    private String handleFind(String input) {
+        if (input.equalsIgnoreCase("find")) {
+            return "Please provide a keyword to search for. e.g., find book\n";
+        }
+        String keyword = input.substring(5).trim().toLowerCase();
+        StringBuilder sb = new StringBuilder("Here are the matching tasks in your list:\n");
+        List<Task> matchingTasks = tasks.asList().stream()
+            .filter(t -> t.getDescription().toLowerCase().contains(keyword))
+            .toList();
+        if (matchingTasks.isEmpty()) {
+            sb.append("No matching tasks found.\n");
+        } else {
+            for (int i = 0; i < matchingTasks.size(); i++) {
+                sb.append(i + 1).append(". ").append(matchingTasks.get(i));
+            }
+        }
+        return sb.toString();
+    }
+
+    private String handleUndo() {
+        if (undoStack.isEmpty()) {
+            return "No actions to undo.\n";
+        }
+        List<Task> previousState = undoStack.pop();
+        tasks.asList().clear();
+        tasks.asList().addAll(previousState);
+        storage.save(tasks.asList());
+        return "Undo successful. The task list has been restored.\n";
+    }
+
+    private String handleUnknown() {
+        return "Unknown Command. Try these commands instead!\n"
+            + "todo <desc>\n"
+            + "deadline <desc> /by <when>\n"
+            + "event <desc> /from <start> /to <end>\n"
+            + "list | mark N | unmark N | bye\n";
     }
 
     /**

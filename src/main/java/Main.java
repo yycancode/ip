@@ -11,7 +11,7 @@ import javafx.stage.Stage;
  */
 public class Main extends Application {
 
-    private final YY YY = new YY();
+    private final YY yy = new YY();
 
     @Override
     public void start(Stage stage) {
@@ -24,7 +24,7 @@ public class Main extends Application {
             stage.setMinHeight(220);
             stage.setMinWidth(417);
             stage.setMaxWidth(417);
-            fxmlLoader.<MainWindow>getController().setDuke(YY); // inject the Duke instance
+            fxmlLoader.<MainWindow>getController().setDuke(yy); // inject the Duke instance
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

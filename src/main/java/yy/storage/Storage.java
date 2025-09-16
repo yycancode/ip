@@ -55,70 +55,103 @@ public final class Storage {
      */
     public ArrayList<Task> load() {
         ensureParentFolder();
+        createFileIfMissing();
+        List<String> lines = readAllLinesOrEmpty();
+        return parseTasks(lines);
+    }
 
-        if (!Files.exists(file)) {
-            try {
-                Files.createFile(file);
-            } catch (IOException e) {
-                // Best-effort: if file creation fails, log and continue with empty list
-                System.err.println("[Storage] Could not create save file: " + e.getMessage());
-            }
-            return new ArrayList<>();
+    /**
+     * Creates the data file if it does not exist. Best-effort; logs on failure.
+     */
+    private void createFileIfMissing() {
+        if (Files.exists(file)) {
+            return;
         }
-
-        ArrayList<Task> tasks = new ArrayList<>();
         try {
-            List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
-            for (String raw : lines) {
-                String line = raw.trim();
-                if (line.isEmpty()) {
-                    continue;
-                }
-
-                String[] parts = line.split("\\s*\\|\\s*");
-                if (parts.length < 3) {
-                    continue;
-                }
-
-                String type = parts[0];
-                boolean isDone = "1".equals(parts[1]);
-                String desc = parts[2];
-
-                Task t = null;
-                switch (type) {
-                case "T": {
-                    t = new Todo(desc);
-                    break;
-                }
-                case "D": {
-                    if (parts.length >= 4) {
-                        String by = parts[3];
-                        t = new Deadline(desc, by);
-                    }
-                    break;
-                }
-                case "E": {
-                    if (parts.length >= 5) {
-                        String from = parts[3];
-                        String to = parts[4];
-                        t = new Event(desc, from, to);
-                    }
-                    break;
-                }
-                default:
-                }
-                if (t != null) {
-                    if (isDone) {
-                        t.mark();
-                    }
-                    tasks.add(t);
-                }
-            }
+            Files.createFile(file);
         } catch (IOException e) {
-            // if anything goes wrong, just start with an empty list
-            return new ArrayList<>();
+            System.err.println("[Storage] Could not create save file: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Reads all lines from the data file using UTF-8. Returns an empty list on failure.
+     */
+    private List<String> readAllLinesOrEmpty() {
+        try {
+            return Files.readAllLines(file, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            // best-effort: if anything goes wrong, start with an empty list
+            return List.of();
+        }
+    }
+
+    /**
+     * Parses the list of raw lines into tasks, skipping malformed lines gracefully.
+     */
+    private ArrayList<Task> parseTasks(List<String> lines) {
+        ArrayList<Task> tasks = new ArrayList<>();
+        for (String raw : lines) {
+            if (raw == null) {
+                continue;
+            }
+            String line = raw.trim();
+            if (line.isEmpty()) {
+                continue;
+            }
+            Task t = parseLine(line);
+            if (t != null) {
+                tasks.add(t);
+            }
         }
         return tasks;
+    }
+
+    /**
+     * Parses a single line into a Task. Returns null if the line is malformed.
+     * Expected formats:
+     *   T | 0/1 | &lt;description&gt;
+     *   D | 0/1 | &lt;description&gt; | &lt;by-ISO&gt;
+     *   E | 0/1 | &lt;description&gt; | &lt;from-ISO&gt; | &lt;to-ISO&gt;
+     */
+    private Task parseLine(String line) {
+        String[] parts = line.split("\\s*\\|\\s*");
+        if (parts.length < 3) {
+            return null;
+        }
+
+        String type = parts[0];
+        boolean isDone = "1".equals(parts[1]);
+        String desc = parts[2];
+
+        Task t = null;
+        switch (type) {
+        case "T": {
+            t = new Todo(desc);
+            break;
+        }
+        case "D": {
+            if (parts.length >= 4) {
+                String by = parts[3];
+                t = new Deadline(desc, by);
+            }
+            break;
+        }
+        case "E": {
+            if (parts.length >= 5) {
+                String from = parts[3];
+                String to = parts[4];
+                t = new Event(desc, from, to);
+            }
+            break;
+        }
+        default:
+        }
+
+        if (t != null && isDone) {
+            t.mark();
+        }
+        return t;
     }
 
     /**
